@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Release.Name }}-httpd
+    {{- range $key, $val := .Values.labels }}
+    {{ $key }}: {{ $val }}
+    {{- end }}
+    {{- template "labels" . }}
+  name: {{ .Release.Name }}-httpd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-httpd
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-httpd
+        {{- include "labels" . | indent 4 }}
+    spec:
+      containers:
+        - name: httpd
+          {{- if .Values.image.tag }}
+          image: {{ .Values.image.repository}}:{{ .Values.image.tag }}
+          {{- else }}
+          image: {{ .Values.image.repository}}:latest
+          {{- end }}
+          resources: {}
+status: {}
